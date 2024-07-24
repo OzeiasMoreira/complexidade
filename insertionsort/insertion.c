@@ -4,32 +4,26 @@
 
 void mistureVetor(int arr[], int n) {
     for (int i = 0; i < n; i++) {
-        if ((rand() / (double)RAND_MAX) < 0.5) {
-            int j = (int)((n - 1) * (rand() / (double)RAND_MAX));
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
-        }
+        int j = rand() % n;
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
 
-void insertionSort(int arr[], int n, int* iteracoes){
-    int i, j, chave;
-    for ( i = 1; i < n; i++)
-    {
-        chave = arr[i];
-        j = i - 1;
-
-        while (j >= 0 && arr[j] > chave)
-        {
+void insertionSort(int arr[], int n, int* iteracoes) {
+    *iteracoes = 0;
+    for (int i = 1; i < n; i++) {
+        int chave = arr[i];
+        int j = i - 1;
+        while (j >= 0 && arr[j] > chave) {
             arr[j + 1] = arr[j];
-            j -= 1;
+            j--;
             (*iteracoes)++;
         }
-        
         arr[j + 1] = chave;
+        (*iteracoes)++;
     }
-    
 }
 
 int main() {
@@ -47,16 +41,25 @@ int main() {
     for (int i = 0; i < num_tamanhos; i++) {
         int tam = tamanhos[i];
         int *arr = (int *)malloc(tam * sizeof(int));
+        if (arr == NULL) {
+            printf("Erro ao alocar memória.\n");
+            fclose(fp_insertion);
+            return 1;
+        }
+
+        for (int j = 0; j < tam; j++) {
+            arr[j] = j;
+        }
 
         for (int j = 0; j < 30; j++) {
             mistureVetor(arr, tam);
-            int iteracoes;
+            int iteracoes = 0;
             insertionSort(arr, tam, &iteracoes);
             fprintf(fp_insertion, "%d ", iteracoes);
         }
         fprintf(fp_insertion, "\n");
 
-        free(arr); 
+        free(arr);
     }
 
     fclose(fp_insertion);
@@ -67,25 +70,34 @@ int main() {
         return 1;
     }
 
-    srand(time(0)); 
-
     for (int i = 0; i < num_tamanhos; i++) {
         int tam = tamanhos[i];
         int *arr = (int *)malloc(tam * sizeof(int));
+        if (arr == NULL) {
+            printf("Erro ao alocar memória.\n");
+            fclose(fp_insertionPiorCaso);
+            return 1;
+        }
 
-        for (int j = 0; j > tam; j++) {
-            arr[j] = j;
+        for (int j = 0; j < tam; j++) {
+            arr[j] = tam - j;
         }
 
         for (int j = 0; j < 30; j++) {
-            mistureVetor(arr, tam);
-            int iteracoes;
+            int iteracoes = 0;
             insertionSort(arr, tam, &iteracoes);
             fprintf(fp_insertionPiorCaso, "%d ", iteracoes);
+
+            // Reverter o array para o pior caso novamente
+            for (int k = 0; k < tam / 2; k++) {
+                int temp = arr[k];
+                arr[k] = arr[tam - k - 1];
+                arr[tam - k - 1] = temp;
+            }
         }
         fprintf(fp_insertionPiorCaso, "\n");
 
-        free(arr); 
+        free(arr);
     }
 
     fclose(fp_insertionPiorCaso);

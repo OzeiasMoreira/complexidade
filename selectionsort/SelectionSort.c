@@ -4,16 +4,14 @@
 
 void mistureVetor(int arr[], int n) {
     for (int i = 0; i < n; i++) {
-        if ((rand() / (double)RAND_MAX) < 0.5) {
-            int j = (int)((n - 1) * (rand() / (double)RAND_MAX));
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
-        }
+        int j = rand() % n;
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
 
-void selectionSort(int arr[], int n, int *iteracoes) {
+void selectionSort(int arr[], int n, int* iteracoes) {
     *iteracoes = 0;
     for (int i = 0; i < n - 1; i++) {
         int min_idx = i;
@@ -45,9 +43,13 @@ int main() {
         int tam = tamanhos[i];
         int *arr = (int *)malloc(tam * sizeof(int));
 
+        for (int j = 0; j < tam; j++) {
+            arr[j] = j;
+        }
+
         for (int j = 0; j < 30; j++) {
             mistureVetor(arr, tam);
-            int iteracoes;
+            int iteracoes = 0;
             selectionSort(arr, tam, &iteracoes);
             fprintf(fp_selection, "%d ", iteracoes);
         }
@@ -64,19 +66,16 @@ int main() {
         return 1;
     }
 
-    srand(time(0)); 
-
     for (int i = 0; i < num_tamanhos; i++) {
         int tam = tamanhos[i];
         int *arr = (int *)malloc(tam * sizeof(int));
 
-        for (int j = 0; j > tam; j++) {
-            arr[j] = j;
+        for (int j = 0; j < tam; j++) {
+            arr[j] = tam - j;
         }
 
         for (int j = 0; j < 30; j++) {
-            mistureVetor(arr, tam);
-            int iteracoes;
+            int iteracoes = 0;
             selectionSort(arr, tam, &iteracoes);
             fprintf(fp_selectionPiorCaso, "%d ", iteracoes);
         }

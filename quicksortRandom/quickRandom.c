@@ -4,50 +4,44 @@
 
 void mistureVetor(int arr[], int n) {
     for (int i = 0; i < n; i++) {
-        if ((rand() / (double)RAND_MAX) < 0.5) {
-            int j = (int)((n - 1) * (rand() / (double)RAND_MAX));
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
-        }
+        int j = rand() % n;
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
 
-int partition(int arr[], int esquerda, int direita, int *iteracoes) {
+void troca(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partition(int arr[], int esquerda, int direita, int* iteracoes) {
     int pivo = arr[direita];
-    int i = esquerda - 1;
-    
-    for (int j = esquerda; j < direita; j++) {
+    int i = (esquerda - 1);
+    for (int j = esquerda; j <= direita - 1; j++) {
         (*iteracoes)++;
         if (arr[j] < pivo) {
             i++;
-            int temp = arr[i];
-            arr[i] = arr[j];
-            arr[j] = temp;
+            troca(&arr[i], &arr[j]);
         }
     }
-    
-    int temp = arr[i + 1];
-    arr[i + 1] = arr[direita];
-    arr[direita] = temp;
-    
-    return i + 1;
+    troca(&arr[i + 1], &arr[direita]);
+    return (i + 1);
 }
 
-int pivoRandom(int arr[], int esquerda, int direita) {
-    int pivo = esquerda + rand() % (direita - esquerda + 1);
-    int temp = arr[pivo];
-    int iteracoes;
-    arr[pivo] = arr[direita];
-    arr[direita] = temp;
+int partitionRandomizado(int arr[], int esquerda, int direita, int* iteracoes) {
+    int randomIndex = esquerda + rand() % (direita - esquerda);
+    troca(&arr[randomIndex], &arr[direita]);
     return partition(arr, esquerda, direita, iteracoes);
 }
 
-void quickSort(int arr[], int esquerda, int direita, int *iteracoes) {
+void quickSortRandomizado(int arr[], int esquerda, int direita, int* iteracoes) {
     if (esquerda < direita) {
-        int pi = pivoRandom(arr, esquerda, direita);
-        quickSort(arr, esquerda, pi - 1, iteracoes);
-        quickSort(arr, pi + 1, direita, iteracoes);
+        int pi = partitionRandomizado(arr, esquerda, direita, iteracoes);
+        quickSortRandomizado(arr, esquerda, pi - 1, iteracoes);
+        quickSortRandomizado(arr, pi + 1, direita, iteracoes);
     }
 }
 
@@ -55,9 +49,9 @@ int main() {
     int tamanhos[] = {5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000};
     int num_tamanhos = sizeof(tamanhos) / sizeof(tamanhos[0]);
 
-    FILE *fp_quick = fopen("QuickSortIteracoesCasoMedio.txt", "w");
-    if (fp_quick == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
+    FILE *fp_quick_random = fopen("QuickSortRandomizadoIteracoesCasoMedio.txt", "w");
+    if (fp_quick_random == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
 
@@ -66,11 +60,6 @@ int main() {
     for (int i = 0; i < num_tamanhos; i++) {
         int tam = tamanhos[i];
         int *arr = (int *)malloc(tam * sizeof(int));
-        if (arr == NULL) {
-            printf("Erro ao alocar memória!\n");
-            fclose(fp_quick);
-            return 1;
-        }
 
         for (int j = 0; j < tam; j++) {
             arr[j] = j;
@@ -79,49 +68,41 @@ int main() {
         for (int j = 0; j < 30; j++) {
             mistureVetor(arr, tam);
             int iteracoes = 0;
-
-            quickSort(arr, 0, tam - 1, &iteracoes);
-            fprintf(fp_quick, "%d ", iteracoes);
+            quickSortRandomizado(arr, 0, tam - 1, &iteracoes);
+            fprintf(fp_quick_random, "%d ", iteracoes);
         }
-        fprintf(fp_quick, "\n");
-        free(arr);
+        fprintf(fp_quick_random, "\n");
+
+        free(arr); 
     }
 
-    fclose(fp_quick);
+    fclose(fp_quick_random);
 
-    FILE *fp_quickPiorcaso = fopen("QuickSortIteracoesPiorCaso.txt", "w");
-    if (fp_quickPiorcaso == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
+    FILE *fp_quick_randomPiorCaso = fopen("QuickSortRandomizadoIteracoesPiorCaso.txt", "w");
+    if (fp_quick_randomPiorCaso == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
-
-    srand(time(0)); 
 
     for (int i = 0; i < num_tamanhos; i++) {
         int tam = tamanhos[i];
         int *arr = (int *)malloc(tam * sizeof(int));
-        if (arr == NULL) {
-            printf("Erro ao alocar memória!\n");
-            fclose(fp_quickPiorcaso);
-            return 1;
-        }
 
         for (int j = 0; j < tam; j++) {
             arr[j] = tam - j;
         }
 
         for (int j = 0; j < 30; j++) {
-            mistureVetor(arr, tam);
             int iteracoes = 0;
-
-            quickSort(arr, 0, tam - 1, &iteracoes);
-            fprintf(fp_quickPiorcaso, "%d ", iteracoes);
+            quickSortRandomizado(arr, 0, tam - 1, &iteracoes);
+            fprintf(fp_quick_randomPiorCaso, "%d ", iteracoes);
         }
-        fprintf(fp_quickPiorcaso, "\n");
-        free(arr);
+        fprintf(fp_quick_randomPiorCaso, "\n");
+
+        free(arr); 
     }
 
-    fclose(fp_quickPiorcaso);
-    return 0;
+    fclose(fp_quick_randomPiorCaso);
 
+    return 0;
 }
