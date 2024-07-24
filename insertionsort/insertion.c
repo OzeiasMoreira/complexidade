@@ -13,28 +13,31 @@ void mistureVetor(int arr[], int n) {
     }
 }
 
-void selectionSort(int arr[], int n, int *iteracoes) {
-    *iteracoes = 0;
-    for (int i = 0; i < n - 1; i++) {
-        int min_idx = i;
-        for (int j = i + 1; j < n; j++) {
+void insertionSort(int arr[], int n, int* iteracoes){
+    int i, j, chave;
+    for ( i = 1; i < n; i++)
+    {
+        chave = arr[i];
+        j = i - 1;
+
+        while (j >= 0 && arr[j] > chave)
+        {
+            arr[j + 1] = arr[j];
+            j -= 1;
             (*iteracoes)++;
-            if (arr[j] < arr[min_idx]) {
-                min_idx = j;
-            }
         }
-        int temp = arr[min_idx];
-        arr[min_idx] = arr[i];
-        arr[i] = temp;
+        
+        arr[j + 1] = chave;
     }
+    
 }
 
 int main() {
     int tamanhos[] = {5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000};
     int num_tamanhos = sizeof(tamanhos) / sizeof(tamanhos[0]);
 
-    FILE *fp_selection = fopen("SelectionSortIteracoesCasoMedio.txt", "w");
-    if (fp_selection == NULL) {
+    FILE *fp_insertion = fopen("insertionSortIteracoesCasoMedio.txt", "w");
+    if (fp_insertion == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
@@ -48,18 +51,18 @@ int main() {
         for (int j = 0; j < 30; j++) {
             mistureVetor(arr, tam);
             int iteracoes;
-            selectionSort(arr, tam, &iteracoes);
-            fprintf(fp_selection, "%d ", iteracoes);
+            insertionSort(arr, tam, &iteracoes);
+            fprintf(fp_insertion, "%d ", iteracoes);
         }
-        fprintf(fp_selection, "\n");
+        fprintf(fp_insertion, "\n");
 
         free(arr); 
     }
 
-    fclose(fp_selection);
+    fclose(fp_insertion);
 
-    FILE *fp_selectionPiorCaso = fopen("SelectionSortIteracoesPiorCaso.txt", "w");
-    if (fp_selectionPiorCaso == NULL) {
+    FILE *fp_insertionPiorCaso = fopen("insertionSortIteracoesPiorCaso.txt", "w");
+    if (fp_insertionPiorCaso == NULL) {
         printf("Erro ao abrir o arquivo.\n");
         return 1;
     }
@@ -77,15 +80,15 @@ int main() {
         for (int j = 0; j < 30; j++) {
             mistureVetor(arr, tam);
             int iteracoes;
-            selectionSort(arr, tam, &iteracoes);
-            fprintf(fp_selectionPiorCaso, "%d ", iteracoes);
+            insertionSort(arr, tam, &iteracoes);
+            fprintf(fp_insertionPiorCaso, "%d ", iteracoes);
         }
-        fprintf(fp_selectionPiorCaso, "\n");
+        fprintf(fp_insertionPiorCaso, "\n");
 
         free(arr); 
     }
 
-    fclose(fp_selectionPiorCaso);
+    fclose(fp_insertionPiorCaso);
 
     return 0;
 }
