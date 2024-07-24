@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 void mistureVetor(int arr[], int n) {
     for (int i = 0; i < n; i++) {
         if ((rand() / (double)RAND_MAX) < 0.5) {
@@ -13,7 +12,6 @@ void mistureVetor(int arr[], int n) {
         }
     }
 }
-
 
 int partition(int arr[], int esquerda, int direita, int *iteracoes) {
     int pivo = arr[direita];
@@ -36,10 +34,18 @@ int partition(int arr[], int esquerda, int direita, int *iteracoes) {
     return i + 1;
 }
 
+int pivoRandom(int arr[], int esquerda, int direita) {
+    int pivo = esquerda + rand() % (direita - esquerda + 1);
+    int temp = arr[pivo];
+    int iteracoes;
+    arr[pivo] = arr[direita];
+    arr[direita] = temp;
+    return partition(arr, esquerda, direita, iteracoes);
+}
 
 void quickSort(int arr[], int esquerda, int direita, int *iteracoes) {
     if (esquerda < direita) {
-        int pi = partition(arr, esquerda, direita, iteracoes);
+        int pi = pivoRandom(arr, esquerda, direita);
         quickSort(arr, esquerda, pi - 1, iteracoes);
         quickSort(arr, pi + 1, direita, iteracoes);
     }
@@ -49,7 +55,6 @@ int main() {
     int tamanhos[] = {5000, 10000, 15000, 20000, 25000, 30000, 35000, 40000, 45000, 50000};
     int num_tamanhos = sizeof(tamanhos) / sizeof(tamanhos[0]);
 
-    
     FILE *fp_quick = fopen("QuickSortIteracoesCasoMedio.txt", "w");
     if (fp_quick == NULL) {
         printf("Erro ao abrir o arquivo!\n");
@@ -67,25 +72,21 @@ int main() {
             return 1;
         }
 
-       
         for (int j = 0; j < tam; j++) {
             arr[j] = j;
         }
 
-       
         for (int j = 0; j < 30; j++) {
             mistureVetor(arr, tam);
             int iteracoes = 0;
 
-            
             quickSort(arr, 0, tam - 1, &iteracoes);
             fprintf(fp_quick, "%d ", iteracoes);
         }
         fprintf(fp_quick, "\n");
-        free(arr); 
+        free(arr);
     }
 
-    
     fclose(fp_quick);
 
     FILE *fp_quickPiorcaso = fopen("QuickSortIteracoesPiorCaso.txt", "w");
@@ -122,4 +123,5 @@ int main() {
 
     fclose(fp_quickPiorcaso);
     return 0;
+
 }
